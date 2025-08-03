@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Course Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="stylesheet" href="course.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      padding: 30px;
+      text-align: center;
+      color: white;
+    }
+
+    #course-title {
+      font-size: 2rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    /* Error message styles */
+    .error-message {
+      padding: 40px;
+      text-align: center;
+      color: #e53e3e;
+      background: #fed7d7;
+      margin: 20px;
+      border-radius: 10px;
+    }
+
+    .error-message h2 {
+      margin-bottom: 15px;
+    }
+
+    .error-message p {
+      margin-bottom: 20px;
+    }
+
+    .error-message a {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 12px 25px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .error-message a:hover {
+      background: #5a67d8;
+    }
+
+    /* Quiz Container Styles */
+    #quiz-container {
+      display: none;
+      padding: 40px;
+    }
+
+    #quiz-container.active {
+      display: block;
+    }
+
+    .progress-bar {
+      background: #e2e8f0;
+      height: 8px;
+      border-radius: 4px;
+      margin-bottom: 30px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #4facfe, #00f2fe);
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .page-info {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #718096;
+      font-weight: 600;
+    }
+
+    #question-container {
+      margin-bottom: 30px;
+    }
+
+    .question-card {
+      background: #f7fafc;
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 20px;
+      border-left: 4px solid #667eea;
+    }
+
+    .question-card h3 {
+      color: #2d3748;
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+
+    .option {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 15px 20px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .option:hover {
+      border-color: #667eea;
+      background: #f0f4ff;
+    }
+
+    .option.correct {
+      background: #c6f6d5;
+      border-color: #38a169;
+      color: #2f855a;
+    }
+
+    .option.wrong {
+      background: #fed7d7;
+      border-color: #e53e3e;
+      color: #c53030;
+    }
+
+    .fib-input {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+
+    .fib-input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 16px;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      gap: 15px;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      min-width: 120px;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      opacity: 0.9;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+    }
+
+    #score-section {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      margin-bottom: 30px;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all 0.5s ease;
+    }
+
+    #score-section.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .dashboard-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #4a5568;
+      color: white;
+      padding: 12px 25px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .dashboard-btn:hover {
+      background: #2d3748;
+      transform: translateY(-2px);
+    }
+
+    #back-btn {
+      text-align: center;
+      padding-bottom: 20px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #718096;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        margin: 10px;
+        border-radius: 15px;
+      }
+
+      .header {
+        padding: 20px;
+      }
+
+      #course-title {
+        font-size: 1.5rem;
+      }
+
+      #quiz-container {
+        padding: 20px;
+      }
+
+      .btn-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1 id="course-title">Loading Quiz...</h1>
+  </div>
+  <div id="error-section" style="display: none;">
+    <div class="error-message">
+      <h2>⚠️ Direct Access Not Allowed</h2>
+      <p>Please select a course and quiz type from the dashboard to start your quiz.</p>
+      <a href="second.html">Go to Dashboard</a>
+    </div>
+  </div>
+
+  
+  <div id="quiz-container">
+    
+    <div class="progress-bar">
+      <div id="progress-fill" class="progress-fill"></div>
+    </div>
+
+
+    <div class="page-info">
+      <span id="page-info">Page 1 of 1</span>
+    </div>
+
+    
+    <div id="question-container">
+    
+    </div>
+
+  
+    <div class="btn-group">
+      <button id="prev-btn" class="btn">
+        <i class="fas fa-arrow-left"></i> Previous
+      </button>
+      <button id="next-btn" class="btn">
+        Next <i class="fas fa-arrow-right"></i>
+      </button>
+      <button id="submit-btn" class="btn btn-primary" style="display: none;">
+        <i class="fas fa-check"></i> Submit Quiz
+      </button>
+    </div>
+
+  
+    <div id="score-section"></div>
+  </div>
+
+  
+  <div id="back-btn">
+    <a href="second.html" class="dashboard-btn">
+      
+  </div>
+</div>
+
+
+<script src="questionData.js"></script>
+
+
+<script src="quizapp.js"></script>
+
+</body>
+</html>
